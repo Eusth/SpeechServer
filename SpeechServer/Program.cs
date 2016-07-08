@@ -15,17 +15,58 @@ namespace SpeechServer
     class Program
     {
         private const string LOCALHOST = "127.0.0.1";
+        private const string DEFAULT_LOCALE = "en-US";
+
+        private static string _Locale = DEFAULT_LOCALE;
+        private static string[] _Words;
+        private static int? _Port;
+
         static void Main(string[] args)
         {
-            //args = new string[] { "1337", "hello;next"};
+            Console.OutputEncoding = Encoding.UTF8;
 
-            if (args.Length < 2) return;
+            ParseArgs(args);
 
-            using (var context = new SpeechRecognitionContext(args[1].Split(';')))
-            using (var server = new SpeechServer(IPAddress.Parse(LOCALHOST), int.Parse(args[0])))
+
+            if (_Words == null && _Words.Length == 0)
             {
-                server.Listen(context);
+                return;
             }
+
+            CultureInfo culture = new CultureInfo(_Locale);
+            using (var context = new SpeechRecognitionContext(culture, _Words))
+            using (var server = GetSpeechServer())
+            {
+                server.ListenAsync(context);
+                Console.In.ReadToEnd();
+            }
+        }
+
+        private static void ParseArgs(string[] args)
+        {
+            for(int i = 0; i < args.Length - 1; i++)
+            {
+                switch(args[i])
+                {
+                    case "--words":
+                        _Words = args[++i].Split(';');
+                        break;
+                    case "--locale":
+                        _Locale = args[++i];
+                        break;
+                    case "--port":
+                        _Port = int.Parse(args[++i]);
+                        break;
+                }
+            }
+        }
+
+        static AbstractSpeechServer GetSpeechServer()
+        {
+            if (_Port == null)
+                return new StdioSpeechServer();
+            else
+                return new SocketSpeechServer(IPAddress.Parse(LOCALHOST), _Port.Value);
         }
 
     }

@@ -13,11 +13,13 @@ namespace SpeechServer
         public List<string> Words = new List<string>();
         private Grammar _WordGrammar;
         private CultureInfo _Culture;
+        private CultureInfo culture;
+        private string[] _Words;
 
         public SpeechRecognitionEngine Engine { get; private set; }
         //public SpeechRecognizer Engine { get; private set; }
 
-        public SpeechRecognitionContext(IEnumerable<string> wordList = null)
+        public SpeechRecognitionContext(CultureInfo culture, IEnumerable<string> wordList = null)
         {
             if(wordList != null)
             {
@@ -25,10 +27,11 @@ namespace SpeechServer
             }
 
             //new SpeechRecognizer().
-            _Culture = new CultureInfo("en-US");
+            _Culture = culture;
             Engine = new SpeechRecognitionEngine(_Culture);
             //Engine = new SpeechRecognizer();
             Engine.SetInputToDefaultAudioDevice();
+            Engine.MaxAlternates = 1;
 
             DictationGrammar dg = new DictationGrammar("grammar:dictation#pronunciation");
             dg.Name = "random";

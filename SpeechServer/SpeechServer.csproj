@@ -57,10 +57,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AbstractSpeechServer.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SpeechRecognitionContext.cs" />
-    <Compile Include="SpeechServer.cs" />
+    <Compile Include="SocketSpeechServer.cs" />
+    <Compile Include="StdioSpeechServer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
